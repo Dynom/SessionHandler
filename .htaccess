@@ -1,0 +1,4 @@
+php_value   session.save_handler		user
+
+# E_ALL | E_STRICT
+php_value   error_reporting         8191
