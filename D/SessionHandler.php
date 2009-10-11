@@ -14,8 +14,22 @@ class D_SessionHandler {
    * @var array
    */
   protected $_drivers = array();
-
   
+  /**
+   * The session ID from when the session started,
+   * prior to calling session_regenerate_id();
+   * @var string
+   */
+  protected $_currentSessionId  = '';
+  
+  /**
+   * Contains the driver name which performed the last
+   * read call.
+   * @var string
+   */
+  protected $_readDriver        = '';
+
+
   /**
    * Construct, calling ->_init()
    */
@@ -33,7 +47,8 @@ class D_SessionHandler {
    * @param D_SessionDriver_Interface $driver
    * @return SessionHandler
    */
-  public function addDriver(D_SessionDriver_Interface $driver) {
+  public function addDriver(D_SessionDriver_Abstract $driver) {
+    $driver->setHandler( $this );
     $this->_drivers[] = $driver;
     return $this;
   }
@@ -46,6 +61,44 @@ class D_SessionHandler {
     session_write_close();
   }
 
+
+  /**
+   * Return whether or not the session has been regenerated.
+   * @return bool
+   */
+  public function changedSID() {
+    return ($this->_currentSessionId === session_id());
+  }
+  
+  
+  /**
+   * Return the ID, prior to calling session_regenerate_id();
+   * @return string
+   */
+  public function getOldSID() {
+    return $this->_currentSessionId;
+  }
+
+
+  /**
+   * Return the most recent generated session id 
+   * @return string
+   */
+  public function getNewSID() {
+    return session_id();
+  }
+  
+  
+  /**
+   * Return the name of the driver that handled the
+   * read operation, if empty no read has been performed
+   * or no driver could satisfy the request
+   * 
+   * @return string 
+   */
+  public function getLastReadDriver() {
+    return $this->_readDriver;
+  }
 
   //---------------------------------------------------------------------------
   // Protected methods
@@ -90,6 +143,9 @@ class D_SessionHandler {
    * @return string
    */
   public function open($savePath, $sessionName) {
+    
+    $this->_currentSessionId = session_id();
+
     $retVal = '';
     foreach($this->_drivers as $driver) {
       try {
@@ -130,6 +186,7 @@ class D_SessionHandler {
     foreach($this->_drivers as $driver) {
       $retVal = $driver->read($id);
       if (is_string($retVal)) {
+        $this->_readDriver = get_class($driver);
         return $retVal;
       }
     }

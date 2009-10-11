@@ -17,16 +17,18 @@
       KEY "updated" ("updated")
     );
  */
-class D_SessionDriver_Mysql implements D_SessionDriver_Interface {
+class D_SessionDriver_Mysql extends D_SessionDriver_Abstract {
   
   /**
    * Mysql connection resource
+   * 
    * @var Resource
    */
   protected $_conn    = NULL;
   
   /**
    * The config
+   * 
    * @var array
    */
   protected $_config  = array(
@@ -39,7 +41,8 @@ class D_SessionDriver_Mysql implements D_SessionDriver_Interface {
 
   /**
    * The data for the current request,
-   * needed to figure some stuff out :->
+   * needed to figure some stuff out.
+   * 
    * @var array
    */
   protected $_data    = array('id'=>NULL);
@@ -62,7 +65,7 @@ class D_SessionDriver_Mysql implements D_SessionDriver_Interface {
   
 
   /**
-   * Open up the backend
+   * Open up the back-end
    * 
    * @param string $savePath
    * @param string $sessionName
@@ -84,24 +87,27 @@ class D_SessionDriver_Mysql implements D_SessionDriver_Interface {
   
 
   /**
-   * Close the backend
+   * Close the back-end
    * 
    * @return boolean 
    */
   public function close() {
-    return mysql_close( $this->_conn );
+    if (is_resource($this->_conn)) {
+      return mysql_close( $this->_conn );
+    }
+    return false;
   }
 
 
   /**
-   * Read the session from our backend
+   * Read the session from our back-end
    * 
    * @param string $id
    * @return string
    */
   public function read($id) {
     $sql    = sprintf(
-                'SELECT data FROM %s WHERE id = %s',
+                'SELECT data FROM %s WHERE id = "%s"',
                 $this->_config['table_name'],
                 mysql_real_escape_string($id)
               );
@@ -124,15 +130,39 @@ class D_SessionDriver_Mysql implements D_SessionDriver_Interface {
    * @return boolean 
    */
   public function write($id, $payload) {
+    
     $sql =  sprintf(
-              'REPLACE INTO %s (id, created, updated, data) VALUES '.
-              '("%s", NOW(), NOW(), "%s")',
+              'UPDATE %s
+               SET  id = "%s",
+                    updated = NOW(),
+                    data = "%s"
+               WHERE id = "%s"
+               LIMIT 1',
               $this->_config['table_name'],
               mysql_real_escape_string($id),
-              mysql_real_escape_string($payload)
-            ); 
+              mysql_real_escape_string($payload),
+              mysql_real_escape_string($this->_handler->getOldSID())
+            );
 
-    return (bool) mysql_query($sql, $this->_conn);
+    $retVal = mysql_query($sql, $this->_conn);
+    if ($retVal && (mysql_affected_rows($this->_conn) === 0)) {
+      $sql =  sprintf(
+                'INSERT INTO %s (id, created, updated, data)
+                 VALUES (
+                  "%s",
+                  NOW(),
+                  NOW(),
+                  "%s"
+                 )',
+                $this->_config['table_name'],
+                mysql_real_escape_string($id),
+                mysql_real_escape_string($payload)
+              );
+
+      return (bool) mysql_query($sql, $this->_conn);
+    }
+    
+    return (bool) $retVal;
   }
 
 

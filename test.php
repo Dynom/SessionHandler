@@ -1,13 +1,10 @@
 <?php
 
-//include 'D/SessionHandler.php';
-//include 'D/SessionDriver/Memcache.php';
-//include 'D/SessionDriver/Mysql.php';
-
+// Registering autoload for the D lib
 spl_autoload_register('_D_autoload');
 function _D_autoload($className) {
   $path = str_replace('_', '/', $className) .'.php';
-  if (is_file($path)) {
+  if (is_readable($path)) {
     include $path;
   }
 }
@@ -16,6 +13,7 @@ function _D_autoload($className) {
 $memcacheConfig = array(
                     'hostname'        => 'localhost'
                   );
+
 $mysqlConfig    = array(
                     'table_name'  => 'phpsession',
                     'username'    => 'd',
@@ -24,26 +22,27 @@ $mysqlConfig    = array(
                     'hostname'    => 'localhost',
                   );
 
+ini_set('session.save_handler', 'user');
 
-// Handler init
+// Init the handler
 $handler = new D_SessionHandler();
 
-// Order matters ! First In, First Used, on fail, the second is used.
+// Registering the drivers
+// Note: Order matters ! (fifo)
 $handler
   ->addDriver( new D_SessionDriver_Memcache($memcacheConfig) )
   ->addDriver( new D_SessionDriver_Mysql($mysqlConfig) );
+  
 
-
-
-
-// Done, start playing with your session!
 
 session_start();
+session_regenerate_id();
+$_SESSION['time'] = time();  
 
-echo $_SESSION['fubar'] ."<br>\n";
 
-$_SESSION['fubar']    = time();
-//$_SESSION['payload']  = range(0,1000);
-
-echo $_SESSION['fubar'];
-
+echo '<pre>';
+var_dump(
+  $_SESSION,
+  session_id(),
+  $handler->getLastReadDriver()
+);

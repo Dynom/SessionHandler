@@ -8,7 +8,7 @@
 /**
  * Memcache session driver
  */
-class D_SessionDriver_Memcache implements D_SessionDriver_Interface {
+class D_SessionDriver_Memcache extends D_SessionDriver_Abstract {
 
   /**
    * @var Memcache
@@ -79,7 +79,10 @@ class D_SessionDriver_Memcache implements D_SessionDriver_Interface {
    * @return boolean 
    */
   public function close() {
-    return $this->_backend->close();
+    if (is_object($this->_backend)) { 
+      return $this->_backend->close();
+    }
+    return false;
   }
   
   
@@ -131,8 +134,4 @@ class D_SessionDriver_Memcache implements D_SessionDriver_Interface {
   public function gc($ttl) {
     return true;
   }
-  
-  
-  
-  
 }

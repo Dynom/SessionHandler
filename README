@@ -1,0 +1,33 @@
+Introduction
+
+This session handler has one purpose: To provide a high-available back-end
+for sessions. Easily implementable for existing and new systems.
+
+
+Installation
+
+Make sure you meet the requirements for the drivers you which to use.
+If you plan to only use one driver, don't use this system as it will
+have overhead with no additional benefits.
+
+Set the config directive 'save_handler' to 'user'. Do this either in
+your php.ini, webserver option directive (such as .htaccess) or in 
+your script (Like so: ini_set('session.save_handler', 'user');)
+
+
+Drivers
+
+At moment of writing there are two, the Memcache and the MySQL
+
+* Memcache
+  Make sure you have the 'Memcache' extension (note that there are multiple
+  Memcache extension.)
+  
+* MySQL
+  Make sure you compiled PHP with MySQL support
+
+* .. 
+  Write your own driver, commit it and supply the documentation ;-)
+
+
+
