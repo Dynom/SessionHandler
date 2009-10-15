@@ -1,23 +1,42 @@
 Introduction
 
-This session handler has one purpose: To provide a high-available back-end
-for sessions. Easily implementable for existing and new systems.
+This session handler has one purpose: To provide a reliable session
+backend by offering a redundant storage system for PHP sessions. Easily 
+implementable for existing and new systems.
+
+
+When not to use it
+
+You can always use it, but if you only have one backend system it's much
+more efficient to use the default features PHP offers.
 
 
 Installation
 
-Make sure you meet the requirements for the drivers you which to use.
-If you plan to only use one driver, don't use this system as it will
-have overhead with no additional benefits.
+* Make sure you meet the requirements for the drivers you wish to use, for
+example: Make sure you have a MySQL server if you want to use the MySQL 
+diver, etc. 
 
-Set the config directive 'save_handler' to 'user'. Do this either in
+* Download the SessionHandler, and make it available in your project(s).
+You can do this in a couple of ways, either hack it in your project or
+use the 'auto_prepend_file' php.ini setting. The test.php shows a possible
+way of including it in your codebase.
+
+* Define the drivers and their configuration.
+
+* Set the config directive 'save_handler' to 'user'. Do this either in
 your php.ini, webserver option directive (such as .htaccess) or in 
 your script (Like so: ini_set('session.save_handler', 'user');)
+
+..And done!
 
 
 Drivers
 
-At moment of writing there are two, the Memcache and the MySQL
+At moment of writing there are two, the Memcache and the MySQL, but more
+will be added later. Writing your own is extremely easy, extend the
+abstract class D_SessionDriver_Abstract and implement the missing parts.
+Look at the available drivers on how to do that.
 
 * Memcache
   Make sure you have the 'Memcache' extension (note that there are multiple
@@ -30,4 +49,20 @@ At moment of writing there are two, the Memcache and the MySQL
   Write your own driver, commit it and supply the documentation ;-)
 
 
+Todo
 
+1 Add unit tests
+2 Fix bugs
+3 Add more drivers
+
+
+License
+
+Licenced under LGPL, if you're not sure wether you can use this code in your
+application. Check http://www.gnu.org/licenses/lgpl.html or send an e-mail with
+your question.
+
+
+Contact
+
+Use the github communication channels and/or check http://blog.dynom.nl
