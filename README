@@ -45,6 +45,9 @@ Look at the available drivers on how to do that.
 * MySQL
   Make sure you compiled PHP with MySQL support
 
+* File
+  Contributed by Tim de Wolf
+
 * .. 
   Write your own driver, commit it and supply the documentation ;-)
 
