@@ -46,8 +46,7 @@ Look at the available drivers on how to do that.
   Make sure you compiled PHP with MySQL support
 
 * File
-  Simple handler just for the fun of it, simulates default php session file handler
-  Dont use together with memcache, makes no sense.
+  Contributed by Tim de Wolf
 
 * .. 
   Write your own driver, commit it and supply the documentation ;-)
