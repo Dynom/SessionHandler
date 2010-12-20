@@ -1,5 +1,7 @@
 Introduction
 
+Found at: https://github.com/Dynom/SessionHandler
+
 This session handler has one purpose: To provide a reliable session
 backend by offering a redundant storage system for PHP sessions. Easily 
 implementable for existing and new systems.
