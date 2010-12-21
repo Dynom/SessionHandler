@@ -122,10 +122,10 @@ class D_SessionHandler
 
 
     /**
-     * Return the most recent generated session id
+     * Return the most recent generated = current session id
      * @return string
      */
-    public function getNewSID()
+    public function getCurrentSID()
     {
         return session_id();
     }
