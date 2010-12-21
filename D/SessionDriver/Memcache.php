@@ -8,8 +8,8 @@
 /**
  * Memcache session driver
  */
-class D_SessionDriver_Memcache extends D_SessionDriver_Abstract {
-
+class D_SessionDriver_Memcache extends D_SessionDriver_Abstract
+{
     /**
      * @var Memcache
      */
@@ -40,7 +40,8 @@ class D_SessionDriver_Memcache extends D_SessionDriver_Abstract {
      * @param array $config
      * @return
      */
-    public function __construct( array $config ) {
+    public function __construct( array $config )
+    {
         $this->_config  = array_merge($this->_config, $config);
     }
 
@@ -52,7 +53,8 @@ class D_SessionDriver_Memcache extends D_SessionDriver_Abstract {
      * @param string $sessionName
      * @return boolean
      */
-    public function open($savePath, $sessionName) {
+    public function open($savePath, $sessionName)
+    {
 
         $this->_backend = new Memcache;
 
@@ -78,10 +80,12 @@ class D_SessionDriver_Memcache extends D_SessionDriver_Abstract {
      *
      * @return boolean
      */
-    public function close() {
+    public function close()
+    {
         if (is_object($this->_backend)) {
             return $this->_backend->close();
         }
+
         return false;
     }
 
@@ -92,7 +96,8 @@ class D_SessionDriver_Memcache extends D_SessionDriver_Abstract {
      * @param string $id
      * @return string
      */
-    public function read($id) {
+    public function read($id)
+    {
         return $this->_backend->get($id);
     }
 
@@ -104,7 +109,8 @@ class D_SessionDriver_Memcache extends D_SessionDriver_Abstract {
      * @param string $payload
      * @return boolean
      */
-    public function write($id, $payload) {
+    public function write($id, $payload)
+    {
         return $this->_backend->set(
             $id,
             $payload,
@@ -120,7 +126,8 @@ class D_SessionDriver_Memcache extends D_SessionDriver_Abstract {
      * @param string $id
      * @return boolean
      */
-    public function destroy($id) {
+    public function destroy($id)
+    {
         return $this->_backend->delete($id);
     }
 
@@ -131,7 +138,8 @@ class D_SessionDriver_Memcache extends D_SessionDriver_Abstract {
      * @param int $ttl
      * @return boolean
      */
-    public function gc($ttl) {
+    public function gc($ttl)
+    {
         return true;
     }
 }

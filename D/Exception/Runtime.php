@@ -1,3 +1,12 @@
 <?php
+/**
+ * @package D
+ * @subpackage D_SessionDriver
+ */
 
-class D_Exception_Runtime extends Exception {}
+/**
+ * Runtime exception
+ */
+class D_Exception_Runtime extends Exception
+{
+}

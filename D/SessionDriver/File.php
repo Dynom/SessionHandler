@@ -9,7 +9,8 @@
 /**
  * File driver
  */
-class D_SessionDriver_File extends D_SessionDriver_Abstract {
+class D_SessionDriver_File extends D_SessionDriver_Abstract
+{
 
     /**
      * @var File
@@ -34,7 +35,8 @@ class D_SessionDriver_File extends D_SessionDriver_Abstract {
      * @param array $config
      * @return
      */
-    public function __construct( array $config ) {
+    public function __construct( array $config )
+    {
         $this->_config = array_merge($this->_config, $config);
 
         $this->_config['save_path'] = $this->_normalizeSavePath(
@@ -55,7 +57,8 @@ class D_SessionDriver_File extends D_SessionDriver_Abstract {
      * @exception Exception is thrown when we got an invalid path
      * @param string $path
      */
-    public function _normalizeSavePath($path) {
+    public function _normalizeSavePath($path)
+    {
         $realPath = realpath($path);
         if ($realPath === false) {
             throw new Exception(
@@ -74,7 +77,8 @@ class D_SessionDriver_File extends D_SessionDriver_Abstract {
      * @param string $sessionName
      * @return boolean
      */
-    public function open($savePath, $sessionName) {
+    public function open($savePath, $sessionName)
+    {
         return (bool) is_writable($this->_config['save_path']); // I've chosen not to use ini here but fileConfig.
     }
 
@@ -84,7 +88,8 @@ class D_SessionDriver_File extends D_SessionDriver_Abstract {
      *
      * @return boolean
      */
-    public function close() {
+    public function close()
+    {
         return (is_resource($this->_backend)) ? fclose($this->_backend) : false;
     }
 
@@ -95,7 +100,8 @@ class D_SessionDriver_File extends D_SessionDriver_Abstract {
      * @param string $id
      * @return string
      */
-    public function read($id) {
+    public function read($id)
+    {
         $file = $this->_config['save_path'] . $this->_config['name_prefix'] . $id;
         $c = null;
 
@@ -115,7 +121,8 @@ class D_SessionDriver_File extends D_SessionDriver_Abstract {
      * @param string $payload
      * @return boolean
      */
-    public function write($id, $payload) {
+    public function write($id, $payload)
+    {
         $file = $this->_config['save_path'] . $this->_config['name_prefix'] . $id;
         $fh = fopen($file, 'w');
         fwrite($fh, $payload);
@@ -130,7 +137,8 @@ class D_SessionDriver_File extends D_SessionDriver_Abstract {
      * @param string $id
      * @return boolean
      */
-    public function destroy($id) {
+    public function destroy($id)
+    {
         $file = $this->_config['save_path'] . $this->_config['name_prefix'] . $id;
         return (bool) unlink($file);
     }
@@ -141,7 +149,8 @@ class D_SessionDriver_File extends D_SessionDriver_Abstract {
      * @param int $ttl
      * @return boolean
      */
-    public function gc($ttl) {
+    public function gc($ttl)
+    {
         $expr = $this->_config['save_path'] . $this->_config['name_prefix'] . '*';
         foreach (glob($expr) as $path) {
             if (filemtime($path) < (time() - $ttl)) {

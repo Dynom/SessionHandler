@@ -7,7 +7,8 @@
 /**
  * The template class for our drivers
  */
-abstract class D_SessionDriver_Abstract implements D_SessionDriver_Interface {
+abstract class D_SessionDriver_Abstract implements D_SessionDriver_Interface
+{
 
     /**
      * The instance of our handler
@@ -23,10 +24,9 @@ abstract class D_SessionDriver_Abstract implements D_SessionDriver_Interface {
      * @param D_SessionHandler $handler
      * @return D_SessionDriver_Abstract
      */
-    public function setHandler(D_SessionHandler $handler) {
+    public function setHandler(D_SessionHandler $handler)
+    {
         $this->_handler = $handler;
         return $this;
     }
-
-
 }

@@ -8,17 +8,17 @@
 /**
  * Mysql session driver
  * The table required:
-    CREATE TABLE "phpsession" (
-      "id" varchar(32) NOT NULL default '',
-      "created" datetime NOT NULL default '0000-00-00 00:00:00',
-      "updated" datetime NOT NULL default '0000-00-00 00:00:00',
-      "data" text,
-      PRIMARY KEY  ("id"),
-      KEY "updated" ("updated")
+    CREATE TABLE `phpsession` (
+      `id` varchar(32) NOT NULL default '',
+      `created` datetime NOT NULL default '0000-00-00 00:00:00',
+      `updated` datetime NOT NULL default '0000-00-00 00:00:00',
+      `data` text,
+      PRIMARY KEY  (`id`),
+      KEY `updated` (`updated`)
     );
  */
-class D_SessionDriver_Mysql extends D_SessionDriver_Abstract {
-
+class D_SessionDriver_Mysql extends D_SessionDriver_Abstract
+{
     /**
      * Mysql connection resource
      *
@@ -59,7 +59,8 @@ class D_SessionDriver_Mysql extends D_SessionDriver_Abstract {
      * @param array $config
      * @return
      */
-    public function __construct( $config ) {
+    public function __construct( $config )
+    {
         $this->_config = array_merge($this->_config, $config);
     }
 
@@ -71,7 +72,8 @@ class D_SessionDriver_Mysql extends D_SessionDriver_Abstract {
      * @param string $sessionName
      * @return boolean
      */
-    public function open($savePath, $sessionName) {
+    public function open($savePath, $sessionName)
+    {
         $this->_conn = mysql_connect(
             $this->_config['hostname'],
             $this->_config['username'],
@@ -91,7 +93,8 @@ class D_SessionDriver_Mysql extends D_SessionDriver_Abstract {
      *
      * @return boolean
      */
-    public function close() {
+    public function close()
+    {
         if (is_resource($this->_conn)) {
             return mysql_close( $this->_conn );
         }
@@ -105,7 +108,8 @@ class D_SessionDriver_Mysql extends D_SessionDriver_Abstract {
      * @param string $id
      * @return string
      */
-    public function read($id) {
+    public function read($id)
+    {
         $sql = sprintf(
             'SELECT data FROM %s WHERE id = "%s" LIMIT 1',
             $this->_config['table_name'],
@@ -129,8 +133,8 @@ class D_SessionDriver_Mysql extends D_SessionDriver_Abstract {
      * @param string $payload
      * @return boolean
      */
-    public function write($id, $payload) {
-
+    public function write($id, $payload)
+    {
         $sql = sprintf(
             'UPDATE %s
             SET  id = "%s",
@@ -172,7 +176,8 @@ class D_SessionDriver_Mysql extends D_SessionDriver_Abstract {
      * @param string $id
      * @return boolean
      */
-    public function destroy($id) {
+    public function destroy($id)
+    {
         $sql = sprintf(
             'DELETE FROM %s WHERE id = "%s"',
             $this->_config['table_name'],
@@ -189,7 +194,8 @@ class D_SessionDriver_Mysql extends D_SessionDriver_Abstract {
      * @param int $ttl
      * @return boolean
      */
-    public function gc($ttl) {
+    public function gc($ttl)
+    {
         $sql = sprintf(
             'DELETE FROM %s WHERE updated < "%s"',
             $this->_config['table_name'],

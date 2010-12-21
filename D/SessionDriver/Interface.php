@@ -1,7 +1,14 @@
 <?php
+/**
+ * @package D
+ * @subpackage D_SessionDriver
+ */
 
-interface D_SessionDriver_Interface {
-
+/**
+ * The driver interface, each session driver must implement this interface.
+ */
+interface D_SessionDriver_Interface
+{
     /**
      * Open function, this works like a constructor in classes and
      * is executed when the session is being opened. The open function

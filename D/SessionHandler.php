@@ -7,7 +7,8 @@
 /**
  * The session interface
  */
-class D_SessionHandler {
+class D_SessionHandler
+{
 
     /**
      * List of SessionHandlerDriver drivers.
@@ -33,7 +34,8 @@ class D_SessionHandler {
     /**
      * Construct, calling ->_init()
      */
-    final public function __construct() {
+    final public function __construct()
+    {
         $this->_init();
         $this->_registerHandler();
     }
@@ -47,9 +49,11 @@ class D_SessionHandler {
      * @param D_SessionDriver_Interface $driver
      * @return SessionHandler
      */
-    public function addDriver(D_SessionDriver_Abstract $driver) {
+    public function addDriver(D_SessionDriver_Abstract $driver)
+    {
         $driver->setHandler( $this );
         $this->_drivers[] = $driver;
+
         return $this;
     }
 
@@ -57,7 +61,8 @@ class D_SessionHandler {
     /**
      * Solving the write-back problem
      */
-    final public function __destruct() {
+    final public function __destruct()
+    {
         session_write_close();
     }
 
@@ -66,7 +71,8 @@ class D_SessionHandler {
      * Return whether or not the session has been regenerated.
      * @return bool
      */
-    public function isChangedSID() {
+    public function isChangedSID()
+    {
         return ($this->_currentSessionId === session_id());
     }
 
@@ -75,7 +81,8 @@ class D_SessionHandler {
      * Return the ID, prior to calling session_regenerate_id();
      * @return string
      */
-    public function getOldSID() {
+    public function getOldSID()
+    {
         return $this->_currentSessionId;
     }
 
@@ -84,7 +91,8 @@ class D_SessionHandler {
      * Return the most recent generated session id
      * @return string
      */
-    public function getNewSID() {
+    public function getNewSID()
+    {
         return session_id();
     }
 
@@ -96,26 +104,29 @@ class D_SessionHandler {
      *
      * @return string
      */
-    public function getLastReadDriver() {
+    public function getLastReadDriver()
+    {
         return $this->_readDriver;
     }
 
-    //---------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     // Protected methods
-    //---------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
 
     /**
      * Child constructor implementation
      */
-    protected function _init() {}
+    protected function _init()
+    {
+    }
 
     /**
      * Registering the handler
      * @return bool
      */
-    protected function _registerHandler() {
-
+    protected function _registerHandler()
+    {
         return session_set_save_handler(
             array($this, 'open'),
             array($this, 'close'),
@@ -127,9 +138,9 @@ class D_SessionHandler {
     }
 
 
-    //---------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     // Session handler methods
-    //---------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
 
     /**
@@ -142,12 +153,13 @@ class D_SessionHandler {
      * @param string $sessionName
      * @return string
      */
-    public function open($savePath, $sessionName) {
+    public function open($savePath, $sessionName)
+    {
 
         $this->_currentSessionId = session_id();
 
         $retVal = '';
-        foreach($this->_drivers as $driver) {
+        foreach ($this->_drivers as $driver) {
             try {
                 $retVal = $driver->open($savePath, $sessionName);
             } catch(D_Exception_Runtime $e) {}
@@ -163,8 +175,9 @@ class D_SessionHandler {
      *
      * @return boolean
      */
-    public function close() {
-        foreach($this->_drivers as $driver) {
+    public function close()
+    {
+        foreach ($this->_drivers as $driver) {
             $driver->close();
         }
 
@@ -182,8 +195,9 @@ class D_SessionHandler {
      *
      * @return string
      */
-    public function read($id) {
-        foreach($this->_drivers as $driver) {
+    public function read($id)
+    {
+        foreach ($this->_drivers as $driver) {
             $retVal = $driver->read($id);
             if (is_string($retVal)) {
                 $this->_readDriver = get_class($driver);
@@ -202,13 +216,14 @@ class D_SessionHandler {
      * @param mixed $payload
      * @return boolean
      */
-    public function write($id, $payload) {
+    public function write($id, $payload)
+    {
         if (gettype($id) !== 'string') {
             settype($id, 'string');
         }
 
         $retVal = false;
-        foreach($this->_drivers as $driver) {
+        foreach ($this->_drivers as $driver) {
             $r = $driver->write($id, $payload);
             if ($r === true) {
                 $retVal = $r;
@@ -226,8 +241,9 @@ class D_SessionHandler {
      * @param string $id
      * @return boolean
      */
-    public function destroy($id) {
-        foreach($this->_drivers as $driver) {
+    public function destroy($id)
+    {
+        foreach ($this->_drivers as $driver) {
             $driver->destroy($id);
         }
 
@@ -237,13 +253,15 @@ class D_SessionHandler {
 
     /**
      * The garbage collector, this is executed when the session garbage
-     * collector is executed and takes the max session lifetime (in seconds) as its only parameter.
+     * collector is executed and takes the max session lifetime (in seconds) as 
+     * it's only parameter.
      *
      * @param int $ttl
      * @return
      */
-    public function gc($ttl) {
-        foreach($this->_drivers as $driver) {
+    public function gc($ttl)
+    {
+        foreach ($this->_drivers as $driver) {
             $driver->gc((int) $ttl);
         }
 
