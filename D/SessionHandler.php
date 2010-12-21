@@ -9,7 +9,6 @@
  */
 class D_SessionHandler
 {
-
     /**
      * List of SessionHandlerDriver drivers.
      * 
@@ -31,7 +30,7 @@ class D_SessionHandler
      * @var D_SessionDriver_Interface|null
      */
     protected $_readDriver = null;
-    
+
     /**
      * An array with failing drivers
      * 
@@ -93,7 +92,7 @@ class D_SessionHandler
     /**
      * Solving the write-back problem
      */
-    final public function __destruct()
+    public function __destruct()
     {
         session_write_close();
     }
