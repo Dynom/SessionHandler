@@ -7,15 +7,15 @@
 
 /**
  * Mysql session driver
- * The table required:
+ * The expected table structure:
     CREATE TABLE `phpsession` (
-      `id` varchar(32) NOT NULL default '',
-      `created` datetime NOT NULL default '0000-00-00 00:00:00',
-      `updated` datetime NOT NULL default '0000-00-00 00:00:00',
-      `data` text,
-      PRIMARY KEY  (`id`),
-      KEY `updated` (`updated`)
-    );
+        `id` VARCHAR(32) NOT NULL,
+        `created` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
+        `updated` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
+        `data` MEDIUMBLOB NULL,
+        PRIMARY KEY (`id`),
+        INDEX `updated` (`updated`)
+    ) COLLATE='latin1_general_cs' ENGINE=InnoDB
  */
 class D_SessionDriver_Mysql extends D_SessionDriver_Abstract
 {
