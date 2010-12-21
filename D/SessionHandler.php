@@ -12,6 +12,7 @@ class D_SessionHandler
 
     /**
      * List of SessionHandlerDriver drivers.
+     * 
      * @var array
      */
     protected $_drivers = array();
@@ -19,32 +20,63 @@ class D_SessionHandler
     /**
      * The session ID from when the session started,
      * prior to calling session_regenerate_id();
+     * 
      * @var string
      */
     protected $_currentSessionId = '';
 
     /**
-     * Contains the driver name which performed the last
-     * read call.
-     * @var string
+     * Contains the driver which performed the last read.
+     * 
+     * @var D_SessionDriver_Interface|null
      */
-    protected $_readDriver = '';
+    protected $_readDriver = null;
+    
+    /**
+     * An array with failing drivers
+     * 
+     * @var array
+     */
+    protected $_failingDrivers = array();
+
+    
+    /**
+     * Create a handler instance and register it.
+     * 
+     * @return D_SessionHandler
+     */
+    static public function register()
+    {
+        $handler = new self;
+        if (!$handler->registerHandler()) {
+            throw new D_Exception_Runtime('Failed to set the save handler.');
+        }
+
+        return $handler;
+    }
 
 
     /**
-     * Construct, calling ->_init()
+     * Registering the handler
+     * @return bool
      */
-    final public function __construct()
+    public function registerHandler()
     {
-        $this->_init();
-        $this->_registerHandler();
+        return session_set_save_handler(
+            array($this, 'open'),
+            array($this, 'close'),
+            array($this, 'read'),
+            array($this, 'write'),
+            array($this, 'destroy'),
+            array($this, 'gc')
+        );
     }
 
 
     /**
      * Add a driver, the order is important. First come, first serve!
-     * All drivers is being written to. But when reading, the first that can
-     * satisfy is used and the remaining are ignored.
+     * All drivers are being written to. But when reading, the first that can
+     * satisfy is used and the remaining drivers are ignored.
      *
      * @param D_SessionDriver_Interface $driver
      * @return SessionHandler
@@ -78,7 +110,9 @@ class D_SessionHandler
 
 
     /**
-     * Return the ID, prior to calling session_regenerate_id();
+     * Return the ID we had before session_regenerate_id() got called (if that
+     * happened)
+     * 
      * @return string
      */
     public function getOldSID()
@@ -102,39 +136,21 @@ class D_SessionHandler
      * read operation, if empty no read has been performed
      * or no driver could satisfy the request
      *
-     * @return string
+     * @return D_SessionDriver_Interface|null
      */
     public function getLastReadDriver()
     {
         return $this->_readDriver;
     }
 
-    //--------------------------------------------------------------------------
-    // Protected methods
-    //--------------------------------------------------------------------------
-
 
     /**
-     * Child constructor implementation
+     * Returns an array with drivers that failed when we called open() on it.
+     * @return array
      */
-    protected function _init()
+    public function getFailingDrivers()
     {
-    }
-
-    /**
-     * Registering the handler
-     * @return bool
-     */
-    protected function _registerHandler()
-    {
-        return session_set_save_handler(
-            array($this, 'open'),
-            array($this, 'close'),
-            array($this, 'read'),
-            array($this, 'write'),
-            array($this, 'destroy'),
-            array($this, 'gc')
-        );
+        return $this->_failingDrivers;
     }
 
 
@@ -155,7 +171,6 @@ class D_SessionHandler
      */
     public function open($savePath, $sessionName)
     {
-
         $this->_currentSessionId = session_id();
 
         $retVal = '';
@@ -200,7 +215,7 @@ class D_SessionHandler
         foreach ($this->_drivers as $driver) {
             $retVal = $driver->read($id);
             if (is_string($retVal)) {
-                $this->_readDriver = get_class($driver);
+                $this->_readDriver = $driver;
                 return $retVal;
             }
         }
@@ -210,21 +225,21 @@ class D_SessionHandler
 
 
     /**
-     * Write the data
+     * Write the data, returns true when at least one of the backends stored
+     * the session successfully
      *
      * @param string $id
-     * @param mixed $payload
+     * @param string $payload
      * @return boolean
      */
     public function write($id, $payload)
     {
-        if (gettype($id) !== 'string') {
-            settype($id, 'string');
-        }
-
         $retVal = false;
         foreach ($this->_drivers as $driver) {
-            $r = $driver->write($id, $payload);
+
+            // Casting to string, some backends have troubles when the payload
+            // isn't a string.
+            $r = $driver->write($id, (string) $payload);
             if ($r === true) {
                 $retVal = $r;
             }
@@ -239,7 +254,7 @@ class D_SessionHandler
      * session_destroy() and takes the session id as its only parameter.
      *
      * @param string $id
-     * @return boolean
+     * @return true
      */
     public function destroy($id)
     {
@@ -257,7 +272,7 @@ class D_SessionHandler
      * it's only parameter.
      *
      * @param int $ttl
-     * @return
+     * @return true
      */
     public function gc($ttl)
     {
