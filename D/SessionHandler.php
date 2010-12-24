@@ -90,6 +90,15 @@ class D_SessionHandler
 
 
     /**
+     * @return array
+     */
+    public function getDrivers()
+    {
+        return $this->_drivers;
+    }
+
+
+    /**
      * Solving the write-back problem
      */
     public function __destruct()
