@@ -117,12 +117,12 @@ class D_SessionDriver_Mysql extends D_SessionDriver_Abstract
         );
 
         $query = mysql_query($sql, $this->_conn);
-        if ($query) {
-            $this->_data = mysql_fetch_assoc($query);
-            return (string) $this->_data['data'];
+        if ($query === false) {
+            throw new D_Exception_Runtime('DB error reading session: '.mysql_error());
         }
 
-        return NULL;
+        $this->_data = mysql_fetch_assoc($query);
+        return (string) $this->_data['data'];
     }
 
 
@@ -174,6 +174,7 @@ class D_SessionDriver_Mysql extends D_SessionDriver_Abstract
      * Delete a session from the backend
      *
      * @param string $id
+
      * @return boolean
      */
     public function destroy($id)
